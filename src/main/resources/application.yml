@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    password: 1234
+    url: jdbc:postgresql://localhost:5432/lms_dto
+    username: postgres
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
