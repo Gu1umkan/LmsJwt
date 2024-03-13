@@ -5,16 +5,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import peaksoft.config.jwt.JwtService;
 import peaksoft.dto.request.StudentRequest;
 import peaksoft.dto.response.HTTPResponse;
+import peaksoft.dto.response.SignResponse;
 import peaksoft.dto.response.StudentResponse;
 import peaksoft.entity.Group;
 import peaksoft.entity.Student;
 import peaksoft.entity.User;
 import peaksoft.enums.Role;
 import peaksoft.enums.StudyFormat;
+import peaksoft.exceptions.MyException;
 import peaksoft.repo.GroupRepo;
 import peaksoft.repo.StudentRepo;
+import peaksoft.repo.UserRepo;
 import peaksoft.service.StudentService;
 
 
@@ -24,9 +28,48 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
+    private final UserRepo userRepo;
     private final StudentRepo studentRepository;
     private final GroupRepo groupRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+
+    @Override
+    public SignResponse signUp(StudentRequest studentRequest) {
+
+        try {
+            if (userRepo.existsByEmail(studentRequest.email()))
+                throw new MyException("Email : " + studentRequest.email() + " already exist");
+
+            User user = new User();
+
+            user.setFirstName(studentRequest.firstName());
+            user.setLastName(studentRequest.lastName());
+            user.setEmail(studentRequest.email());
+            user.setPassword(passwordEncoder.encode(studentRequest.password()));
+            user.setRole(Role.STUDENT);
+            studentRepository.save(Student.builder()
+                    .user(user)
+                    .phoneNumber(studentRequest.phoneNumber())
+                    .studyFormat(studentRequest.studyFormat())
+                    .build());
+            userRepo.save(user);
+
+            String newToken = jwtService.createToken(user);
+            return SignResponse.builder()
+                    .token(newToken)
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .role(user.getRole())
+                    .message("Successfully registered!")
+                    .build();
+
+        }catch (RuntimeException | MyException e){
+            return SignResponse.builder()
+                    .message(e.getMessage())
+                    .build();
+        }
+    }
 
     @Override @Transactional
     public HTTPResponse save(StudentRequest studentRequest) {

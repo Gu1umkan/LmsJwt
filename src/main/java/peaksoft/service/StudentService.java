@@ -2,12 +2,14 @@ package peaksoft.service;
 
 import peaksoft.dto.request.StudentRequest;
 import peaksoft.dto.response.HTTPResponse;
+import peaksoft.dto.response.SignResponse;
 import peaksoft.dto.response.StudentResponse;
 import peaksoft.enums.StudyFormat;
 
 import java.util.List;
 
 public interface StudentService {
+    SignResponse signUp(StudentRequest studentRequest);
     HTTPResponse save(StudentRequest studentRequest);
 
     HTTPResponse asSign(Long groupId, Long studentId);

@@ -4,10 +4,12 @@ import peaksoft.dto.request.InstructorRequest;
 import peaksoft.dto.response.HTTPResponse;
 import peaksoft.dto.response.InfoInstructorsResponse;
 import peaksoft.dto.response.InstructorResponse;
+import peaksoft.dto.response.SignResponse;
 
 import java.util.List;
 
 public interface InstructorService {
+    SignResponse signUp(InstructorRequest instructorRequest);
     HTTPResponse save(InstructorRequest instructorRequest);
 
     HTTPResponse assign(Long companyId, Long instructorId);

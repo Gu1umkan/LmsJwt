@@ -8,6 +8,7 @@ public record SignResponse(
         String token,
         Long id,
         Role role,
-        String email
+        String email,
+        String message
 ){
 }
